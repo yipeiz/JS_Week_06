@@ -17,7 +17,9 @@ downloadData.done(function(data) {
   /* ================================
   Start your code here
   ================================ */
-
+  var myHTML = '<div id="items"></div>';
+  $(".sidebar").append("WTF");
+  $(".sidebar").append(myHTML);
   /* ================================
   End your code here
   ================================ */

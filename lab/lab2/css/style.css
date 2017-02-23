@@ -27,8 +27,47 @@ p.main {
     font-size: 16px;
 }
 
+
+#back {
+  position: absolute;
+  left: 320px ;
+}
+
+
 .legend {
   position: absolute;
+  top: 420px;
+  left: 15px;
   background-color: #fff;
   z-index: 2000;
+  width: 200px;
+}
+
+.foo {
+  float: right;
+  width: 20px;
+  height: 12px;
+  border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.mon {
+  background: #ff00ff;
+}
+.tue {
+  background: #00ffff;
+}
+.wed {
+  background: #00000f;
+}
+.thu {
+  background: #0f00ff;
+}
+.fri {
+  background: #0044ff;
+}
+.sat {
+  background: #1234ff;
+}
+.sun {
+  background: #ff0000;
 }

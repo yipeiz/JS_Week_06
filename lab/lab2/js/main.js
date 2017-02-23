@@ -14,7 +14,10 @@ var Stamen_TonerLite = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{
   ext: 'png'
 }).addTo(map);
 
-
+var downloadData = $.ajax("https://raw.githubusercontent.com/CPLN692-MUSA611/datasets/master/geojson/philadelphia-garbage-collection-boundaries.geojson");
+downloadData.done(function(data) {
+  var parsedData = JSON.parse(data);
+});
 /* =====================
 
 ## Task 1
@@ -23,6 +26,8 @@ Load the dataset into our application. Set the 'dataset' variable to
 https://raw.githubusercontent.com/CPLN692-MUSA611/datasets/master/geojson/philadelphia-garbage-collection-boundaries.geojson
 
 You should now have GeoJSON data projected onto your map!
+
+
 
 ## Task 2
 
@@ -110,7 +115,7 @@ event.target.getBounds() inside of the layer.on function.
 
 ## Task 8 (Stretch Goal)
 
-Add a "Close" or "X" button to the top right of your sidebar. When when the
+Add a "Close" or "X" button to the top right of your sidebar. When the
 button is clicked, call a function closeResults that performs the opposite
 processes as showResults, returning the user to the original state of the
 application.
@@ -123,11 +128,29 @@ of the application to report this information.
 
 ===================== */
 
-var dataset = "https://raw.githubusercontent.com/CPLN692-MUSA611/datasets/master/geojson/philadelphia-garbage-collection-boundaries.geojson"
+var dataset = "https://raw.githubusercontent.com/CPLN692-MUSA611/datasets/master/geojson/philadelphia-garbage-collection-boundaries.geojson";
 var featureGroup;
+var parsedData;
+var theCount = {
+        'SUN':  0,
+        'MON':  0,
+        'TUE':  0,
+        'WED':  0,
+        'THU':  0,
+        'FRI':  0,
+        'SAT':  0,
+};
 
 var myStyle = function(feature) {
-  return {};
+  switch (feature.properties.COLLDAY) {
+            case 'SUN': return {color: "#ff0000"};
+            case 'MON':   return {color: "#ff00ff"};
+            case 'TUE':   return {color: "#00ffff"};
+            case 'WED':   return {color: "#00000f"};
+            case 'THU':   return {color: "#0f00ff"};
+            case 'FRI':   return {color: "#0044ff"};
+            case 'SAT':   return {color: "#1234ff"};
+          }
 };
 
 var showResults = function() {
@@ -143,32 +166,69 @@ var showResults = function() {
   $('#results').show();
 };
 
+var closeResults = function() {
+  $('#intro').show();
+  $('#results').hide();
+  map.fitBounds(featureGroup.getBounds());
+};
+
+var button = document.getElementById('back');
+button.onclick = function() {
+  closeResults();
+};
+
 
 var eachFeatureFunction = function(layer) {
+  var theDay = layer.feature.properties.COLLDAY;
+  theCount[theDay] += 1;
+  console.log(Object.keys(myObject));
+
   layer.on('click', function (event) {
     /* =====================
     The following code will run every time a layer on the map is clicked.
     Check out layer.feature to see some useful data about the layer that
     you can use in your application.
     ===================== */
-    console.log(layer.feature);
+    var day = '';
+    console.log(layer.feature.properties.COLLDAY);
+    switch (layer.feature.properties.COLLDAY) {
+                case 'SUN':   day = "Sunday";break;
+                case 'MON':   day = "Monday";break;
+                case 'TUE':   day = "Tuesday";break;
+                case 'WED':   day = "Wednesday";break;
+                case 'THU':   day = "Thursday";break;
+                case 'FRI':   day = "Friday";break;
+                case 'SAT':   day = "Saturday";break;
+              }
+    console.log(day);
+    $(".day-of-week").empty();
+    $(".day-of-week").append(day);
+    $(".theID").empty();
+    $(".theID").append(layer.feature.properties.OBJECTID);
+
+    map.fitBounds(event.target.getBounds());
     showResults();
   });
 };
 
 var myFilter = function(feature) {
-  return true;
+  return feature.properties.COLLDAY !== " " ;
+  //return true;
 };
 
-$(document).ready(function() {
-  $.ajax(dataset).done(function(data) {
-    var parsedData = JSON.parse(data);
-    featureGroup = L.geoJson(parsedData, {
-      style: myStyle,
-      filter: myFilter
-    }).addTo(map);
-
-    // quite similar to _.each
-    featureGroup.eachLayer(eachFeatureFunction);
+var initiate = function() {$(document).ready(function() {
+    $.ajax(dataset).done(function(data) {
+      parsedData = JSON.parse(data);
+      featureGroup = L.geoJson(parsedData, {
+        style: myStyle,
+        filter: myFilter
+      }).addTo(map);
+      console.log(parsedData.features);
+      // quite similar to _.each
+      featureGroup.eachLayer(eachFeatureFunction);
+    });
   });
-});
+};
+
+initiate();
+console.log(theCount);
